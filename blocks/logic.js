@@ -361,6 +361,113 @@ Blockly.Blocks['logic_operation'] = {
   }
 };
 
+Blockly.Blocks['logic_operation_clause'] = {
+  /**
+   * Block for chaining multiple logical operations in a single clause.
+   * @this Blockly.Block
+   */
+  OPERATORS: [['-', 'NONE'],
+              [Blockly.Msg.LOGIC_OPERATION_AND, 'AND'],
+              [Blockly.Msg.LOGIC_OPERATION_OR, 'OR']],
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_OPERATION_HELPURL);
+    this.setColour(Blockly.Blocks.logic.HUE);
+    this.appendDummyInput('leadingBracket')
+        .appendField('(');
+    this.appendDummyInput('trailingBracket')
+        .appendField(')');
+    this.addIndexedInput(0);
+    this.setOutput(true, 'Boolean');
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg.LOGIC_OPERATION_CLAUSE_TOOLTIP);
+  },
+  /**
+   * Create a single input using the given index
+   * @param {!int} index Index of this inputvalue/operator combination.
+   * @this Blockly.Block
+   */
+  addIndexedInput: function (index) {
+    var block = this;
+    this.appendValueInput('V' + index)
+        .setCheck('Boolean');
+    var updateFunction = this.updateInputCountCallable(index);
+    var dropdown = new Blockly.FieldDropdown(this.OPERATORS, updateFunction);
+    this.appendDummyInput('O' + index)
+        .appendField(dropdown, 'OP' + index);
+    this.resetTrailingBracket();
+  },
+  /**
+   * Reset the trailing bracket to be at the end of this blocks inputs.
+   * @this Blockly.Block
+   */
+  resetTrailingBracket: function () {
+    this.removeInput('trailingBracket');
+    this.appendDummyInput('trailingBracket')
+        .appendField(')');
+  },
+  /**
+   * Create XML to represent the number of inputs.
+   * @return {Element} XML storage element.
+   * @this Blockly.Block
+   */
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('length', "" + (this.inputList.length / 2 - 1));
+    return container;
+  },
+  /**
+   * Parse XML to restore the number of inputs.
+   * @param {!Element} xmlElement XML storage element.
+   * @this Blockly.Block
+   */
+  domToMutation: function(xmlElement) {
+    var inputCount = parseInt(xmlElement.getAttribute('length'), 10);
+    for (var i = 1; i < inputCount; i++) {
+      this.addIndexedInput(i);
+    }
+  },
+  /**
+   * Create a listener that updates the input fields in accordance with the
+   * set operators.
+   * @param {!int} index The context index this input callable is working on.
+   * @this Blockly.Block
+   * @return {function} Listener for operator changes.
+   */
+  updateInputCountCallable: function (index) {
+    var block = this;
+    return function (operator) {
+      // Utilizing a closure is strictly necessary here, since the information
+      // on which index and block the change has happened would be lost otherwise.
+      switch (operator) {
+        case 'AND':
+        case 'OR':
+          var nextValue = block.getInput('V' + (index + 1));
+          var nextOperator = block.getInput('O' + (index + 1));
+          if (nextValue && nextOperator) {
+            break;
+          }
+          block.addIndexedInput(index + 1);
+          break;
+        default:
+          var removeList = [];
+          for (var inputIndex in block.inputList) {
+            var name = block.inputList[inputIndex].name;
+            if (!name || !parseInt(name.substr(1))) {
+              continue;
+            }
+            if (parseInt(name.substr(1)) <= index) {
+              continue;
+            }
+            removeList.push(name);
+          }
+          removeList.forEach(function (name) {
+            block.removeInput(name);
+          });
+      }
+    };
+  }
+};
+
 Blockly.Blocks['logic_negate'] = {
   /**
    * Block for negation.

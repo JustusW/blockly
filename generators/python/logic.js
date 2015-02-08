@@ -95,6 +95,20 @@ Blockly.Python['logic_operation'] = function(block) {
   return [code, order];
 };
 
+Blockly.Python['logic_operation_clause'] = function(block) {
+  var order = Blockly.Python.ORDER_ATOMIC;
+  var code = '';
+  for (var i=0; i < block.inputList.length/2 - 1; i++) {
+    var value = Blockly.Python.valueToCode(block, 'V' + i, order);
+    var operator = block.getFieldValue('OP' + i);
+    code += value;
+    if (operator == 'AND' || operator == 'OR') {
+      code += ' ' + operator + ' ';
+    }
+  }
+  return ['(' + code + ')', Blockly.Python.ORDER_ATOMIC];
+};
+
 Blockly.Python['logic_negate'] = function(block) {
   // Negation.
   var argument0 = Blockly.Python.valueToCode(block, 'BOOL',

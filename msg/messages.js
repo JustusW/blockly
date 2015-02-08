@@ -263,6 +263,8 @@ Blockly.Msg.LOGIC_OPERATION_AND = 'and';
 Blockly.Msg.LOGIC_OPERATION_TOOLTIP_OR = 'Return true if at least one of the inputs is true.';
 /// block text - See [https://en.wikipedia.org/wiki/Disjunction https://en.wikipedia.org/wiki/Disjunction].
 Blockly.Msg.LOGIC_OPERATION_OR = 'or';
+/// block text - See [https://en.wikipedia.org/wiki/Clause_(logic) https://en.wikipedia.org/wiki/Clause_(logic)].
+Blockly.Msg.LOGIC_OPERATION_CLAUSE_TOOLTIP = 'Return true if the logical clause is true.';
 
 /// url - Information about logical negation.  The translation of [https://en.wikipedia.org/wiki/Logical_negation https://en.wikipedia.org/wiki/Logical_negation] is recommended if it exists in the target language.
 Blockly.Msg.LOGIC_NEGATE_HELPURL = 'https://github.com/google/blockly/wiki/Logic#not';
